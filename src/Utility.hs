@@ -3,7 +3,7 @@ module Utility(
 ) where
 
 import qualified Data.Set as Set (Set)
-import qualified Data.Map as Map (Map, lookup) 
+import qualified Data.Map.Strict as Map (Map, lookup) 
 
 toFunction :: (Ord k) => (Map.Map k v) -> (k -> v)
 toFunction mp key = case Map.lookup key mp of (Just x) -> x

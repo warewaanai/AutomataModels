@@ -8,7 +8,11 @@ module NFA(
     toDFA,
     fromDFA,
     intLabeling,
-    stringLabeling
+    stringLabeling,
+
+    followEps,
+    followChar,
+    followCharClosed
 ) where
 
 import Utility
@@ -22,7 +26,7 @@ import qualified Data.Map.Strict as Map
 
 
 
-data Sigma = Ch Char | Eps deriving (Eq)
+data Sigma = Ch Char | Eps deriving (Eq, Show)
 
 instance Ord Sigma where
     compare Eps Eps = EQ
@@ -36,7 +40,7 @@ data NFA state = NFA {
     delta :: Map (Sigma, state) (Set state), -- (char, source) -> {targets}
     start :: state,
     end :: Set state
-}
+} deriving(Show)
 
 deltaF :: (Ord state) => (NFA state) -> (Sigma -> state -> Set state)
 deltaF nfa = curry f
@@ -71,7 +75,7 @@ followCharClosed nfa ch = (fEps . fChar . fEps)
         fChar = followChar nfa ch
 
 follow :: (Ord state) => NFA state -> ([Sigma] -> Set state -> Set state)
-follow nfa str s = foldr (followCharClosed nfa) s str
+follow nfa str s = foldr (followCharClosed nfa) s $ reverse str
 
 accepts :: (Ord state) => NFA state -> String -> Bool
 accepts nfa str0 = not $ Set.null $ finalAccepting
@@ -101,6 +105,7 @@ toDFA nfa0 = DFA states1 delta1 start1 end1
                 $ start nfa0
 
         end1    = Set.map (followEps nfa0)
+                $ Set.filter (not. (Set.disjoint $ end nfa0))
                 $ Set.powerSet
                 $ end nfa0
 

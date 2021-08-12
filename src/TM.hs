@@ -4,6 +4,8 @@ module TM(
     Dir,
     DTM(DTM),
     TAPE,
+    readTape,
+    writeTape,
     step,
     steps,
     accepts,
@@ -51,7 +53,7 @@ toIterator tm (s0, tape0, pos0) = res
         (s1, ch1, dir1) = dT s0 (tapeRead tape0 pos0)
         pos1           = if dir1 == L then pos1 - 1 else pos1 + 1
         tape1          = writeTape tape0 pos0 ch1
-        res            = if      s0 == acceptng tm || s0 == rejecting tm then Left "Iteration Attempt After Execution Halted" 
+        res            = if      s0 == acceptng tm || s0 == rejecting tm then Left "Iteration Attempt After Machine Halted" 
                          else if pos1 < 0                                then Left "Tape Head Moved to Negative Position"
                                                                          else Right (s1, t1, pos1)
 
